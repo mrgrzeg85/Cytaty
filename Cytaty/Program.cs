@@ -5,7 +5,7 @@ namespace Cytaty
 {
     internal class Program
     {
-        public const string FILE_NAME= @"D:\cytaty.txt\";
+        public const string FILE_NAME= @"cytaty.txt";
         public static List<string> cytaty = new List<string>();
         static void Main(string[] args)
         {
@@ -15,11 +15,6 @@ namespace Cytaty
             WyswietlMenu();
 
         }
-
-
-
-
-
             static void MenuItem()
         {
             List<string> menuList = new List<string>();
@@ -38,22 +33,23 @@ namespace Cytaty
         }
         static void WyswietlMenu()
             {
-                Console.Clear();
-                string wybor;
+                Console.Clear();            
                 Console.WriteLine($"W bazie znajduje się {IloscCytatow(cytaty)} cytatów ");
                 Console.WriteLine("Wybierze opcje z menu podając cyfrę od 1 do 7:");
 
                 MenuItem();
-
-                wybor = Console.ReadLine();
-                Console.WriteLine($"Wybrana opcja to : {wybor}");
-                int itemId = 0;
-                int.TryParse(wybor, out itemId);
-
-                switch (itemId)
+                if(!int.TryParse(Console.ReadLine(), out int itemId))
+                {
+                    Console.WriteLine("Wybrano złą opcję! Powrót do menu");
+                    Console.ReadKey();
+                    WyswietlMenu();
+                    return;
+                 }
+            Console.WriteLine($"Wybrana opcja to : {itemId}");
+            switch (itemId)
                 {
                     case 1:
-                        WyswietlCystaty(cytaty);
+                        WyswietlCystaty();
                         break;
                     case 2:
                        AddCytat(cytaty);
@@ -75,33 +71,28 @@ namespace Cytaty
                         break;
                     default:
                     Console.WriteLine("Wybrano złą opcje! Powrót do Menu");
-                    WyswietlMenu();
-                        break;
-
+                    break;
                 }
-             
-
-
-
-            }
+            Console.ReadKey();
+            WyswietlMenu();
+        }
         
 
-        static void WyswietlCystaty(List<string> list)
+        static void WyswietlCystaty()
         {
            
             Console.Clear();
-            if (NoEmptyLis(list))
+            if (NoEmptyLis())
             {
-                foreach (var item in list)
+                foreach (var item in cytaty)
                 {
                     Console.WriteLine($"{item}");
                 }
             }
             else
             {
-                char  pytanie;
                 Console.WriteLine("Należy załadować cytaty z pliku lub dodać nowe. Czy to zrobić Y lub N");
-                pytanie=char.Parse(Console.ReadLine().ToLower());
+                char pytanie=char.Parse(Console.ReadLine().ToLower());
                 switch (pytanie)
                 {
                     case 'y':
@@ -122,43 +113,40 @@ namespace Cytaty
             WyswietlMenu();
         }
 
-        static bool NoEmptyLis(List<string> list) {
+        static bool NoEmptyLis() {
 
-            if (list.Count > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return cytaty.Count>0;
         }
 
         static List<string> AddCytat(List<string> list)
         {
-            string ilosc;
+            int index = 0;
             Console.Clear();
             Console.WriteLine("Ile chcesz dodać cytatów:");
-            ilosc = Console.ReadLine();
-            int iloscCytatow = 0, index=0;
-            
-            int.TryParse(ilosc, out iloscCytatow);
 
-            while(index < iloscCytatow)
+            if(int.TryParse(Console.ReadLine(), out int iloscCytatow))
             {
-                Console.WriteLine("Podaj cytat:");
-                list.Add(Console.ReadLine());
-                index++;
+                while (index < iloscCytatow)
+                {
+                    Console.WriteLine("Podaj cytat:");
+                    list.Add(Console.ReadLine());
+                    index++;
+                }
+                Console.WriteLine("Dodanie cytatu do bazy powiodło się! Powrót do Menu");
+                Console.ReadKey();
+                WyswietlMenu();
+                return list;
             }
-            Console.WriteLine("Dodanie cytatu do bazy powiodło się! Powrót do Menu");
-            Console.ReadKey();
-            WyswietlMenu();
-            return list;
+            else
+            {
+             Console.WriteLine("Wybrano złą opcje! Powrót do Menu");
+             return list;
+            }
         }
 
         static void WczytajZpliku()
         {
-            if (!NoEmptyLis(cytaty))
+            if (!NoEmptyLis())
             {
                 StreamReader sr = File.OpenText(FILE_NAME);
                 string linia = "";
@@ -182,7 +170,7 @@ namespace Cytaty
 
         static void ZapiszDoPliku(List<string> list)
         {
-            if (NoEmptyLis(list))
+            if (NoEmptyLis())
             {
                 StreamWriter sw;
                 if (!File.Exists(FILE_NAME))
@@ -225,7 +213,7 @@ namespace Cytaty
 
         static void DelCytaty(List<string> lista)
         {
-            if(NoEmptyLis(lista))
+            if(NoEmptyLis())
             {
                 Console.WriteLine($"Chcesz usunąć { IloscCytatow(lista)} z bazy");
                 lista.Clear();
@@ -240,8 +228,6 @@ namespace Cytaty
             }
             
         }
-       
-
     }
 }
 
